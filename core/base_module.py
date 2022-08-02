@@ -35,7 +35,5 @@ class BaseModule(object):
     def add_route(self, name, url):
         '''Add a route to the module for each templated page. Each route name will reference a function in the module and the url will correspond to the URI path of the URL. (i.e. name: Authenticate, url: /authenticate)
         '''
-        route = {}
-        route['name'] = name
-        route['url'] = url
+        route = {'name': name, 'url': url}
         self.routes.append(route)

@@ -30,12 +30,12 @@ class CredSniper():
 
 
     def prepare_module(self):
-        package = 'modules/{}/templates'.format(self.module_name)
+        package = f'modules/{self.module_name}/templates'
         env = Environment(
             loader=PackageLoader('credsniper', package),
             autoescape=select_autoescape(['html', 'xml'])
         )
-        module_path = 'modules.{}.{}'.format(self.module_name, self.module_name)
+        module_path = f'modules.{self.module_name}.{self.module_name}'
         self.module = importlib.import_module(module_path).load(self.enable_2fa)
         self.module.env = env
         self.module.final_url = self.final_url
@@ -112,7 +112,7 @@ class CredSniper():
     def verbose_print(self, message):
         if self.verbose:
             dt = time.strftime('%Y-%m-%d %H:%M')
-            print('[{}] {}'.format(dt, message))
+            print(f'[{dt}] {message}')
 
 app = Flask(__name__)
 cs = CredSniper()
@@ -123,20 +123,17 @@ def custom_401(error):
 
 if __name__ == "__main__":
     output.print_banner()
-    cs.verbose_print('Module: {}'.format(cs.module_name))
-    cs.verbose_print('Port: {}'.format(cs.port))
-    cs.verbose_print('Use SSL: {}'.format(cs.enable_ssl))
-    cs.verbose_print('2FA Enabled: {}'.format(cs.enable_2fa))
+    cs.verbose_print(f'Module: {cs.module_name}')
+    cs.verbose_print(f'Port: {cs.port}')
+    cs.verbose_print(f'Use SSL: {cs.enable_ssl}')
+    cs.verbose_print(f'2FA Enabled: {cs.enable_2fa}')
     cs.verbose_print('API: Loaded')
-    cs.verbose_print('API Token: {}'.format(cs.api.api_token))
-    cs.verbose_print('Final URL: {}'.format(cs.final_url))
-    cs.verbose_print('Hostname: {}'.format(cs.hostname))
+    cs.verbose_print(f'API Token: {cs.api.api_token}')
+    cs.verbose_print(f'Final URL: {cs.final_url}')
+    cs.verbose_print(f'Hostname: {cs.hostname}')
 
     if cs.enable_ssl:
-        context = (
-            'certs/{}.cert.pem'.format(cs.hostname),
-            'certs/{}.privkey.pem'.format(cs.hostname)
-        )
+        context = f'certs/{cs.hostname}.cert.pem', f'certs/{cs.hostname}.privkey.pem'
     else:
         context = None
 
@@ -148,7 +145,8 @@ if __name__ == "__main__":
         )
     except FileNotFoundError as e:
         if cs.enable_ssl:
-            msg = "SSL certificates not found. Please ensure '{}' and '{}' exist.".format(context[0], context[1])
+            msg = f"SSL certificates not found. Please ensure '{context[0]}' and '{context[1]}' exist."
+
             output.exception(msg)
         else:
             output.exception(e)

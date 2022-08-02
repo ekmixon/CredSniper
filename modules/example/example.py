@@ -55,9 +55,7 @@ class ExampleModule(BaseModule):
 
         city, region, zip_code = '','',''
         try:
-            geoip_url = 'https://freegeoip.net/json/{}'.format(
-                request.remote_addr
-            )
+            geoip_url = f'https://freegeoip.net/json/{request.remote_addr}'
             geo_browser = mechanicalsoup.StatefulBrowser()
             geo_response = geo_browser.open(geoip_url)
             geo = json.loads(geo_response.text)

